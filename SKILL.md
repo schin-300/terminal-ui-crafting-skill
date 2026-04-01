@@ -1,115 +1,141 @@
 ---
 name: terminal-ui-crafting
-description: Use when asked to design, implement, or refine a stylish terminal UI or TUI, especially a Textual/Rich dashboard with a strong visual identity, boot splash, keyboard navigation, status panels, queue tables, or a Hermes-HUD-like neon terminal aesthetic for Python tools.
-version: 1.0.0
+description: Use when asked to design, implement, or refine a terminal UI or TUI. Focus on choosing the right terminal stack, preserving the repo's conventions, and building a clear operator workflow instead of forcing a default visual theme or canned layout.
+version: 2.0.0
 metadata:
   hermes:
-    tags: [tui, terminal-ui, textual, rich, dashboard, design]
+    tags: [tui, terminal-ui, textual, rich, dashboard, cli, ux]
     related_skills: []
 ---
 
 # Terminal UI Crafting
 
-Build terminal interfaces that feel intentional, vivid, and operator-friendly rather than generic debug screens.
+Build terminal interfaces that help the user do real work.
 
-Use this skill when the user wants:
-- a TUI
-- a terminal dashboard
-- a Hermes-HUD-style interface
-- a neon or cinematic command-line UI
-- a richer terminal control surface for an existing tool
+This skill is for:
+- full-screen TUIs
+- keyboard-driven CLI flows
+- terminal dashboards and control surfaces
+- operator consoles
+- terminal UX cleanup for existing tools
 
-## Default Stack
+Core rule: do not impose a default theme, layout, or ornamental style.
+Choose the stack, information density, navigation model, and visual treatment from:
+1. the user's request
+2. the repo's existing conventions
+3. the actual workflow the interface must support
 
-For Python projects, prefer:
-- `textual` for the app shell, tabs, keybindings, live refresh, and layout
-- `rich` for panels, tables, colors, boot banners, and text composition
-- `typer` for CLI entrypoints that launch the TUI cleanly
+## Stack Selection
 
-If the repo already uses another terminal stack, follow the repo instead of forcing Textual.
+Follow the repo's current stack first.
+Do not force Textual just because it is available.
 
-## Design Target
+Good defaults by task type:
+- Python full-screen app: `textual`
+- Python rich formatted output inside a normal CLI: `rich`
+- Python command entrypoints: `typer`
+- Python line-oriented interactive flows: `prompt_toolkit`
+- Low-dependency terminal apps: `curses`, `blessed`, or the repo's existing primitives
 
-Aim for one clear visual metaphor, not random ornament.
+If the project is not Python, prefer the ecosystem-native terminal stack already in use.
 
-Good defaults:
-- background near-black with blue/cyan or amber accents
-- one short masthead that names the mode
-- 3 to 5 stat cards at the top
-- one main queue or table for the core job to be done
-- one activity feed
-- visible keyboard shortcuts in the footer
+## Design Principles
 
-Avoid:
-- rainbow palettes
-- giant walls of ASCII
-- too many bordered boxes competing for attention
-- fake telemetry with no meaning
+1. Workflow first.
+   Start from the operator's actual job, not from widgets or style ideas.
+
+2. Real state over decorative state.
+   Show meaningful queues, tasks, processes, logs, selections, forms, or status.
+   Avoid fake telemetry.
+
+3. The layout should follow the task.
+   Use the minimum number of panes, tabs, tables, lists, and shortcuts needed to make the workflow clear.
+
+4. Match the host tool.
+   A release tool, monitor, queue runner, and terminal file picker should not all look the same.
+
+5. Be opinionated only when needed.
+   If the user asks for a particular aesthetic, deliver it.
+   If they do not, stay neutral and functional.
 
 ## Implementation Workflow
 
-1. Pick the operating metaphor.
-2. Decide the core tabs or panes from the user workflow.
-3. Make the overview screen useful first.
-4. Add a short boot splash or branded masthead.
-5. Add hotkeys for the main navigation.
-6. Keep data loading separate from rendering.
-7. Do a terminal smoke test with a forced timeout so startup issues surface fast.
+1. Inspect the existing repo, commands, and data sources.
+2. Write a short spec before implementation that names:
+   - the primary user workflow
+   - the scan questions the UI must answer quickly
+   - the actions the user must be able to take
+   - important constraints such as terminal size, dependencies, refresh model, and latency
+3. Choose the smallest set of UI primitives that fits the workflow:
+   - table
+   - list
+   - tree
+   - log pane
+   - status line
+   - form
+   - tabs
+   - split panes
+   - modal/help overlay
+4. Keep data loading and business logic separate from rendering.
+5. Build the smallest useful screen first.
+6. Add navigation, keyboard shortcuts, and refresh behavior.
+7. Add optional polish only after the interface is already useful.
+8. Smoke test the real entrypoint in a terminal.
 
-## Layout Pattern
+## Layout Guidance
 
-Use this shape unless the repo already suggests something better:
+Do not default to one canned layout.
+Pick the layout pattern that matches the job:
 
-1. Header with title and clock
-2. Masthead panel with mode name and one-line description
-3. Tab bar
-4. Overview tab:
-   - stat cards
-   - core queue
-   - repo or environment summary
-5. Detail tabs:
-   - agents/workers
-   - tasks or PRs
-   - activity/logs
-   - info/help
-6. Footer with bindings
+- queue-first: when users mostly scan and act on jobs
+- log-first: when recency and event flow matter most
+- form or wizard: when guided input is the main task
+- split view: when a list/detail workflow dominates
+- overview + details: when users need a summary first and drill-down second
+- command palette / shortcut surface: when speed matters more than rich panels
 
-## Visual Recipe
+If a summary screen exists, make it answer the top scan questions immediately.
 
-Use a restrained palette:
-- background: deep navy or black-blue
-- primary accent: cyan/ice blue
-- secondary accent: slate or steel blue
-- body text: pale blue-gray
+## Visual Guidance
 
-Good panel titles are short and functional:
-- `Workers`
-- `Queue`
-- `Merged`
-- `Activity Feed`
-- `Info`
+Visual direction is optional and contextual.
 
-## Boot Splash
+If the user or repo already implies a style, follow that.
+If there is no visual direction, keep styling restrained and legible:
+- consistent spacing
+- clear hierarchy
+- limited color accents
+- readable contrast
+- borders only where they help grouping
 
-Boot splashes should be quick and memorable.
+Avoid prescribing exact colors, mastheads, clocks, splash screens, or dashboard chrome unless the task calls for them.
 
-Pattern:
-- 4 to 6 lines of compact ASCII
-- one subtitle explaining the mode
-- sleep no more than about 0.7s unless the user wants drama
-- always provide a `--no-boot` or equivalent skip path
+## Textual / Rich Guidance
 
-## Textual Guidance
+When using Textual:
+- keep `App` state thin
+- prefer service/snapshot layers for data collection
+- use `DataTable` for scan-heavy tabular views
+- use `Static` with Rich renderables for summary or help panels
+- use `TabbedContent` only when tabs genuinely simplify navigation
+- register direct keybindings for high-frequency actions
 
-- Keep `App` state thin; fetch snapshot data from a service layer.
-- Use `TabbedContent` for multi-view dashboards.
-- Use `DataTable` for rows the user scans repeatedly.
-- Use `Static` with Rich renderables for overview and info panes.
-- Register direct keybindings like `1`, `2`, `3`, `r`, `q`.
+When using Rich without a full TUI:
+- use tables, panels, grouped renderables, and progress components for readable CLI output
+- favor clear command output over pseudo-dashboard theatrics
 
-For concrete patterns, read:
-- `references/style-playbook.md`
-- `references/hermes-pr-hub-example.md`
+## Real Terminal Rule
+
+If the user asks for many real terminals on one surface, do not fake that with static panes.
+A dashboard is not the same thing as hosting real PTYs.
+
+For real multi-terminal surfaces, prefer tools built for PTYs such as:
+- `tmux`
+- `zellij`
+- terminal emulators with pane APIs such as `wezterm` or `kitty`
+- web approaches based on `xterm.js` plus a PTY backend
+
+Use this skill for terminal interfaces and operator surfaces, but do not pretend a status dashboard is a true multi-terminal host.
 
 ## Validation
 
@@ -121,12 +147,16 @@ pytest -q
 timeout 2s your-cli tui --no-boot
 ```
 
-If the app uses a project venv, run the installed entrypoint from that venv.
+Adjust the validation to the actual stack:
+- if there is no pytest suite, run the project's real test command
+- if there is no full-screen TUI, smoke test the actual interactive entrypoint instead
+- if a project venv exists, run the installed command from that venv
 
 ## Output Standard
 
 When you finish a terminal UI task, report:
-- what visual direction you chose
-- where the TUI entrypoint lives
+- what workflow the interface was designed around
+- which stack or libraries were used and why
+- where the entrypoint lives
 - how to launch it
 - what you verified

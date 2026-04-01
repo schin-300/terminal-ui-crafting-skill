@@ -1,62 +1,40 @@
-# Hermes PR Hub Example
+# Workflow-First Operator Surface Example
 
-This skill was distilled from the standalone `hermes-pr-hub` project.
+This reference captures the reusable lesson from a terminal dashboard that worked well.
 
-## What worked
+## What mattered
 
-### 1. Lead with the operator workflow
+### 1. The overview answered real scan questions
 
-The first screen answers:
-- how many workers exist
-- how many maintainers exist
-- how many PRs are waiting
-- what repo is under management
+The first screen told the operator what they needed to know right away.
+That is the reusable pattern.
+Not the exact widgets, colors, or tab names.
 
-That made the interface feel useful immediately.
+### 2. Summary plus drill-down was enough
 
-### 2. One strong identity line
+A compact overview screen paired with more detailed views worked because the workflow needed:
+- quick situational awareness
+- fast movement into detail
+- clear keyboard navigation
 
-The masthead used:
-- `Neural Maintainer Mode`
-- `Maintainer approvals • Hermes workers • Git worktrees`
+That pattern is broadly useful, but should not be forced on every TUI.
 
-That gave the tool a personality without hiding what it does.
+### 3. Rendering stayed separate from data collection
 
-### 3. Rich overview, simple details
+The interface was easier to extend because data gathering lived outside the widget tree.
+Keep that separation whenever the UI has live refresh or multiple views.
 
-The overview is composed with Rich panels and tables.
-The detailed tabs use `DataTable` or `Static`.
+### 4. Style supported the tool instead of replacing it
 
-This split is a good default:
-- `Rich` for polished summary views
-- `Textual` widgets for structured interactive sections
+A little visual identity helped orientation, but the interface succeeded because it surfaced real tasks and state.
+That is the main lesson.
 
-### 4. A short boot splash
+## Transferable rule
 
-The splash used compact ASCII, blue accents, and a single subtitle.
-It looked intentional without slowing the tool down much.
+When building a terminal interface, define these first:
+1. what the user is trying to accomplish
+2. what they need to scan quickly
+3. what actions need first-class shortcuts
+4. what should stay visible while they work
 
-### 5. Keep the data model separate
-
-The TUI reads from a service snapshot rather than owning all business logic.
-That made it easy to add tabs and refresh behavior later.
-
-## Current Hermes PR Hub tab model
-
-- `Overview`
-- `Agents`
-- `Pull Requests`
-- `Activity`
-- `Info`
-
-That is a solid template for operator dashboards in general.
-
-## Reusable lesson
-
-When building a terminal dashboard, do not start with widgets.
-Start with:
-1. the scan questions
-2. the operator's top action
-3. the visual tone
-
-Then choose the widgets that support those decisions.
+Then choose the layout and styling that supports those answers.

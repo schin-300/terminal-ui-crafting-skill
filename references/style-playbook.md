@@ -1,90 +1,67 @@
-# Terminal UI Style Playbook
+# Terminal UI Playbook
 
 ## Core principle
 
-A good terminal UI should feel like a tool with a point of view.
+A terminal UI should make the tool easier to operate.
+Start from the workflow, not from a default theme.
 
-The fastest path to that:
-- one metaphor
-- one palette
-- one obvious primary workflow
+Useful questions:
+- what does the user scan first?
+- what actions must be fast?
+- what state changes matter?
+- does this need a full-screen app or just better terminal output?
 
-## Recommended stack
+## Pick the right level of interface
 
-For Python:
-- `textual` for app shell and live interaction
-- `rich` for composition and styling
-- `typer` for the launcher
+Choose the lightest interface that fits the job:
+- formatted CLI output for commands that mostly print results
+- interactive prompt flow for guided input
+- full-screen TUI for persistent state, navigation, or live refresh
+- real PTY tooling when the requirement is multiple actual terminals
 
-## Palette recipe
+## Pick the stack from the job
 
-Start from:
-- background: `#030813`
-- panel border: `#21425d`
-- primary accent: `#79dcff`
-- body text: `#d3ecff`
-- muted text: `#6f95b3`
+Good defaults for Python:
+- `rich` for formatted command output
+- `typer` for command structure
+- `prompt_toolkit` for interactive prompts and command palettes
+- `textual` for full-screen TUIs
 
-Then adjust, but do not let every panel become a different color.
+If the repo already uses another stack, stay with it.
 
-## Composition recipe
+## Choose primitives intentionally
 
-### Masthead
+Prefer a small number of primitives that match the task:
+- table for scan-heavy records
+- list for ordered choices
+- tree for nested resources
+- log pane for recency
+- detail pane for selected-item inspection
+- status line for compact live state
+- modal/help overlay for commands the user will forget
 
-Use a short mode line and one supporting sentence.
+## Visual treatment
 
-Example:
-- title: `Neural Maintainer Mode`
-- subtitle: `Maintainer approvals • Hermes workers • Git worktrees`
+Visual style is contextual, not mandatory.
 
-### Stat cards
+If the user asks for a specific look, follow it.
+If not, keep the interface readable and restrained:
+- clear hierarchy
+- limited accent colors
+- spacing that separates groups
+- borders only when they improve scanning
 
-Keep them tiny.
-Each card should answer one scan question.
+Do not add clocks, boot splashes, banners, or decorative chrome unless they help the product.
 
-Examples:
-- how many workers exist
-- how many PRs are pending
-- how many merges landed
+## Validation
 
-### Queue panel
-
-Always include the queue or table that matters most to the operator.
-Make it visible from the first screen.
-
-### Activity feed
-
-Show recent actions in one or two columns:
-- time
-- event summary
-
-## Keyboard design
-
-Keep the first pass simple:
-- `1` through `N` for tabs
-- `r` for refresh
-- `q` for quit
-
-If a view has direct actions later, add single-key verbs only after the base navigation feels obvious.
-
-## Boot sequence
-
-Good:
-- compact ASCII
-- short subtitle
-- slight delay
-
-Bad:
-- giant splash art
-- long intro sequence
-- multiple unskippable phases
-
-## Smoke test pattern
-
-Use a forced timeout so you validate startup without getting trapped in the full TUI:
+Smoke test the real entrypoint in a real terminal.
+Typical Python baseline:
 
 ```bash
+python3 -m compileall src tests
+pytest -q
 timeout 2s your-cli tui --no-boot
 ```
 
-If the output paints a screen and exits only because of the timeout, that is usually enough for a startup smoke check.
+Adjust to the actual stack and entrypoint.
