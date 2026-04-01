@@ -1,0 +1,8 @@
+interface:
+  display_name: "Terminal UI Crafting"
+  short_description: "Design stylish Textual and Rich dashboards"
+  brand_color: "#79DCFF"
+  default_prompt: "Use $terminal-ui-crafting to design or refine a polished terminal UI with a strong visual identity."
+
+policy:
+  allow_implicit_invocation: true
